@@ -60,13 +60,15 @@ def launch_tool(command):
 
         # 对于 .msc 和 .cpl 文件，使用 start 命令
         if command.endswith((".msc", ".cpl")):
-            subprocess.run(f"start {command}", shell=True, check=True)
+            subprocess.run(f"start {command}", shell=True, check=True,
+                           stderr=subprocess.DEVNULL)
         else:
-            subprocess.run(command, shell=True, check=True)
+            subprocess.run(command, shell=True, check=True,
+                           stderr=subprocess.DEVNULL)
 
         print(f"{Color.GREEN}✔ 已启动: {command}{Color.RESET}")
     except subprocess.CalledProcessError:
-        print(f"{Color.RED}✘ 启动失败: {command}{Color.RESET}")
+        print(f"{Color.RED}✘ 启动失败: {command}（命令可能已移除或不在系统中）{Color.RESET}")
     except FileNotFoundError:
         print(f"{Color.RED}✘ 未找到命令或文件: {command}{Color.RESET}")
 

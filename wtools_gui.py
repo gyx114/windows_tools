@@ -27,12 +27,6 @@ class WindowsToolsGUI:
         self.root.geometry("820x580")
         self.root.minsize(700, 450)
 
-        # 图标（如果有）
-        try:
-            self.root.iconbitmap(default="")
-        except Exception:
-            pass
-
         self._build_ui()
         self._load_tools()
 
@@ -220,12 +214,14 @@ class WindowsToolsGUI:
         cmd = tool[0]
         try:
             if cmd.endswith((".msc", ".cpl")):
-                subprocess.run(f"start {cmd}", shell=True, check=True)
+                subprocess.run(f"start {cmd}", shell=True, check=True,
+                               stderr=subprocess.DEVNULL)
             else:
-                subprocess.run(cmd, shell=True, check=True)
+                subprocess.run(cmd, shell=True, check=True,
+                               stderr=subprocess.DEVNULL)
             self.status_var.set(f"✅ 已启动: {cmd}")
         except Exception as e:
-            messagebox.showerror("启动失败", f"无法启动 {cmd}\n{e}")
+            messagebox.showerror("启动失败", f"无法启动 {cmd}\n该命令可能已从系统中移除")
 
     def _on_tool_launch(self, event):
         """双击/回车启动"""
