@@ -1,7 +1,13 @@
 """
 Windows 常用工具数据定义
 包含通过 Win+R 可调用的各种系统工具、管理控制台、控制面板项等
+
+数据来源优先级:
+  ① tools.json 配置文件（由 adder 工具管理）
+  ② 本文件的 TOOLS 硬编码列表（回退方案）
 """
+
+import config
 
 # 工具分类
 CATEGORY_SYSTEM = "系统管理"
@@ -91,28 +97,54 @@ TOOLS = [
 ]
 
 
-def get_tools_by_category():
+# ── 动态加载（优先 JSON 配置，回退硬编码） ──
+
+_ACTIVE_TOOLS = None
+
+
+def get_active_tools():
+    """
+    获取当前活跃的工具列表
+    优先使用 JSON 配置文件，不存在则回退到硬编码 TOOLS
+    """
+    global _ACTIVE_TOOLS
+    if _ACTIVE_TOOLS is None:
+        loaded = config.load_tools()
+        _ACTIVE_TOOLS = loaded if loaded is not None else TOOLS
+    return _ACTIVE_TOOLS
+
+
+def reload_tools():
+    """清除缓存，下次调用 get_active_tools 时重新从配置文件读取"""
+    global _ACTIVE_TOOLS
+    _ACTIVE_TOOLS = None
+
+
+def get_tools_by_category(tools_list=None):
     """按分类返回工具字典"""
+    tools = tools_list if tools_list is not None else get_active_tools()
     result = {}
-    for cmd, name, category, desc in TOOLS:
+    for cmd, name, category, desc in tools:
         result.setdefault(category, []).append((cmd, name, desc))
     return result
 
 
-def search_tools(keyword):
+def search_tools(keyword, tools_list=None):
     """搜索工具"""
+    tools = tools_list if tools_list is not None else get_active_tools()
     keyword = keyword.lower()
     results = []
-    for cmd, name, category, desc in TOOLS:
+    for cmd, name, category, desc in tools:
         if keyword in cmd.lower() or keyword in name.lower() or keyword in desc.lower():
             results.append((cmd, name, category, desc))
     return results
 
 
-def get_categories():
+def get_categories(tools_list=None):
     """获取所有分类（保持顺序）"""
+    tools = tools_list if tools_list is not None else get_active_tools()
     seen = []
-    for _, _, category, _ in TOOLS:
+    for _, _, category, _ in tools:
         if category not in seen:
             seen.append(category)
     return seen

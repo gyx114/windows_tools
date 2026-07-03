@@ -31,6 +31,10 @@ env/
 *.manifest
 *.exe.manifest
 
+# ── 用户配置 ──
+tools.json
+.write_test
+
 # ── 项目临时文件 ──
 *.log
 *.tmp

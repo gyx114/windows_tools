@@ -2,62 +2,83 @@
 
 一键启动 Windows 系统工具的 CLI 工具，支持所有常用的 Win+R 命令。
 
+单个 `wtools.exe` 即可使用全部功能（**含管理/添加/删除工具**），无需安装 Python。
+
 ## 功能
 
-- 列出并启动 **管理控制台** (.msc) — `services.msc`, `compmgmt.msc` 等
-- 列出并启动 **控制面板项** (.cpl) — `appwiz.cpl`, `ncpa.cpl` 等
-- 列出并启动 **系统命令** — `regedit`, `dxdiag`, `msconfig` 等
-- 交互式菜单浏览和启动
-- 关键词搜索
-- 按分类组织（系统管理、硬件设备、网络、磁盘、用户安全等）
+- 🚀 列出并启动 **管理控制台** (.msc) — `services.msc`, `compmgmt.msc` 等
+- 🚀 列出并启动 **控制面板项** (.cpl) — `appwiz.cpl`, `ncpa.cpl` 等
+- 🚀 列出并启动 **系统命令** — `regedit`, `dxdiag`, `msconfig` 等
+- 📋 交互式菜单浏览和启动
+- 🔍 关键词搜索
+- 📂 按分类组织（系统管理、硬件设备、网络、磁盘、用户安全等）
+- ✏️ **内置管理功能** — 添加/删除/导入工具，无需额外工具
+- 💾 配置文件自动保存，支持便携模式和系统安装模式
 
 ## 快速使用（无需 Python）
 
-直接用预编译的 exe 即可，无需安装 Python：
-
 ```cmd
-# 下载后直接在命令行运行
-dist\wtools.exe              # 交互式菜单
-dist\wtools.exe list         # 列出所有工具
-dist\wtools.exe run calc     # 启动计算器
-dist\wtools.exe run services.msc
-dist\wtools.exe search 网络
+wtools.exe                   # 交互式菜单
+wtools.exe list              # 列出所有工具
+wtools.exe run calc          # 启动计算器
+wtools.exe run services.msc
+wtools.exe search 网络
 ```
 
 > 将 exe 所在目录添加到系统 PATH 后，可直接在 **Win+R** 运行 `wtools`。
 
-## 使用方法（Python 源码）
+### 管理工具（交互式菜单按 `m` 键）
 
-需要 Python 3.x 环境：
-
-### 交互式模式
-```bash
-python windows_tools_cli.py
+```
+┌─ 主菜单 ─────────────────────┐
+│  按 m → 管理工具              │
+│     1. 添加工具               │
+│     2. 删除工具               │
+│     3. 查看配置状态            │
+│     4. 创建新分类             │
+│     5. 从 JSON 文件导入       │
+│     6. 重置配置               │
+└──────────────────────────────┘
 ```
 
-### 列出所有工具
+## 配置文件说明
+
+程序自动在以下位置查找 `tools.json`：
+
+| 优先级 | 位置 | 适用场景 |
+|--------|------|---------|
+| ① | `exe 同目录/tools.json` | 便携模式（U盘、自定义目录） |
+| ② | `%APPDATA%\windows_tools\tools.json` | System32 等只读目录 |
+| ③ | 无配置文件 | **回退使用内置硬编码数据** |
+
+## 管理工具（命令行）
+
+通过 `adder.py` 可在命令行中管理工具条目：
+
 ```bash
-python windows_tools_cli.py list
+# 添加工具
+python adder.py add wt.exe Terminal 终端 "Windows Terminal"
+
+# 删除工具
+python adder.py remove wt.exe
+
+# 创建新分类
+python adder.py category "开发者工具"
+
+# 查看配置状态
+python adder.py list
+
+# 从 JSON 文件批量导入
+python adder.py import my_tools.json
+
+# 重置配置，恢复内置数据
+python adder.py reset
 ```
 
-### 直接启动指定工具
-```bash
-python windows_tools_cli.py run services.msc
-python windows_tools_cli.py run appwiz.cpl
-python windows_tools_cli.py run regedit
-```
-
-### 搜索工具
-```bash
-python windows_tools_cli.py search 网络
-python windows_tools_cli.py search disk
-```
-
-### 使用批处理文件
+或使用批处理文件：
 ```cmd
-wtools list
-wtools run services.msc
-wtools search 网络
+adder list
+adder add wt.exe Terminal 终端 "Windows Terminal"
 ```
 
 ## 包含的工具分类
@@ -73,17 +94,20 @@ wtools search 网络
 | 外观与辅助 | 4 | desk.cpl, osk, magnify |
 | 其他工具 | 10 | notepad, calc, mspaint, snippingtool |
 
-共计 **67** 个工具。
+> 可通过 `adder add` 或交互菜单添加更多工具和分类。
 
 ## 项目结构
 
 ```
 windows_tools/
 ├── dist/                   # 编译好的 exe 文件
-│   └── wtools.exe
-├── windows_tools_cli.py    # 主程序
-├── tools_data.py           # 工具数据
+│   └── wtools.exe          # 单文件，自带全部功能
+├── windows_tools_cli.py    # 主程序入口
+├── adder.py                # 命令行管理工具
+├── config.py               # 配置读写 + 路径查找 + 核心管理逻辑
+├── tools_data.py           # 硬编码工具数据（回退方案）
 ├── wtools.bat              # 批处理启动脚本
+├── adder.bat               # 批处理管理脚本
 ├── .gitignore
 └── README.md
 ```
