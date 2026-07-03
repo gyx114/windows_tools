@@ -1,0 +1,36 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+build/
+*.spec
+*.whl
+site/
+
+# 保留发布版 exe
+!dist/*.exe
+
+# ── Virtual Environment ──
+venv/
+.venv/
+env/
+.env/
+
+# ── IDE / Editor ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ── PyInstaller ──
+*.manifest
+*.exe.manifest
+
+# ── 项目临时文件 ──
+*.log
+*.tmp
