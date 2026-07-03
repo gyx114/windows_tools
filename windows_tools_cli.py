@@ -32,8 +32,8 @@ def print_banner():
     """打印程序标题"""
     banner = f"""
 {Color.CYAN}╔══════════════════════════════════════════╗
-║      {Color.BOLD}Windows Tools Launcher{Color.RESET}{Color.CYAN}        ║
-║      {Color.DIM}快速启动 Windows 系统工具{Color.RESET}{Color.CYAN}      ║
+║      {Color.BOLD}Windows Tools Launcher{Color.RESET}{Color.CYAN}              ║
+║      {Color.DIM}快速启动 Windows 系统工具{Color.RESET}{Color.CYAN}           ║
 ╚══════════════════════════════════════════╝{Color.RESET}
 """
     print(banner)
