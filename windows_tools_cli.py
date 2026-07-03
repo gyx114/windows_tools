@@ -7,6 +7,8 @@ Windows Tools CLI - 通过命令行快速启动 Windows 系统工具
 import subprocess
 import sys
 import os
+import shutil
+from pathlib import Path
 from tools_data import TOOLS, get_tools_by_category, get_categories, search_tools, CATEGORY_OTHER
 from config import (
     add_tool, remove_tool, create_category,
@@ -52,25 +54,34 @@ def list_all_tools():
 
 def launch_tool(command):
     """启动指定的 Windows 工具"""
-    try:
-        # 某些命令需要以特定方式启动
-        if command.lower() in ("shutdown",):
-            print(f"{Color.YELLOW}⚠ 请使用完整参数启动，例如: shutdown /s /t 0{Color.RESET}")
+    # 检查命令是否存在
+    cmd_lower = command.lower()
+
+    # shutdown 需要参数
+    if cmd_lower in ("shutdown",):
+        print(f"{Color.YELLOW}⚠ 请使用完整参数启动，例如: shutdown /s /t 0{Color.RESET}")
+        return
+
+    # .msc/.cpl 文件：检查 System32 目录
+    if command.endswith((".msc", ".cpl")):
+        sys_path = Path(os.environ["SystemRoot"], "System32", command)
+        if not sys_path.exists():
+            print(f"{Color.RED}✘ 未找到: {command}{Color.RESET}")
+            return
+    else:
+        # 可执行文件：用 shutil.which 搜索 PATH
+        found = shutil.which(command)
+        if not found:
+            print(f"{Color.RED}✘ 未找到: {command}（该程序可能未安装或已从系统中移除）{Color.RESET}")
             return
 
-        # 对于 .msc 和 .cpl 文件，使用 start 命令
-        if command.endswith((".msc", ".cpl")):
-            subprocess.run(f"start {command}", shell=True, check=True,
-                           stderr=subprocess.DEVNULL)
-        else:
-            subprocess.run(command, shell=True, check=True,
-                           stderr=subprocess.DEVNULL)
-
+    # 启动（使用 start 异步启动，避免 GUI 程序拦截控制台）
+    try:
+        subprocess.run(f"start \"\" {command}", shell=True,
+                       stderr=subprocess.DEVNULL)
         print(f"{Color.GREEN}✔ 已启动: {command}{Color.RESET}")
-    except subprocess.CalledProcessError:
-        print(f"{Color.RED}✘ 启动失败: {command}（命令可能已移除或不在系统中）{Color.RESET}")
-    except FileNotFoundError:
-        print(f"{Color.RED}✘ 未找到命令或文件: {command}{Color.RESET}")
+    except Exception:
+        print(f"{Color.RED}✘ 启动失败: {command}{Color.RESET}")
 
 
 def interactive_mode():

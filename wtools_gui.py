@@ -9,6 +9,8 @@ from tkinter import ttk, messagebox, simpledialog
 import sys
 import os
 import subprocess
+import shutil
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -212,16 +214,25 @@ class WindowsToolsGUI:
         if not tool:
             return
         cmd = tool[0]
+
+        # 检查命令是否存在
+        if cmd.endswith((".msc", ".cpl")):
+            sys_path = Path(os.environ["SystemRoot"], "System32", cmd)
+            if not sys_path.exists():
+                messagebox.showerror("启动失败", f"未找到: {cmd}")
+                return
+        else:
+            if not shutil.which(cmd):
+                messagebox.showerror("启动失败",
+                                     f"未找到: {cmd}\n该程序可能未安装或已从系统中移除")
+                return
+
         try:
-            if cmd.endswith((".msc", ".cpl")):
-                subprocess.run(f"start {cmd}", shell=True, check=True,
-                               stderr=subprocess.DEVNULL)
-            else:
-                subprocess.run(cmd, shell=True, check=True,
-                               stderr=subprocess.DEVNULL)
+            subprocess.run(f"start \"\" {cmd}", shell=True,
+                           stderr=subprocess.DEVNULL)
             self.status_var.set(f"✅ 已启动: {cmd}")
         except Exception as e:
-            messagebox.showerror("启动失败", f"无法启动 {cmd}\n该命令可能已从系统中移除")
+            messagebox.showerror("启动失败", f"无法启动 {cmd}\n{e}")
 
     def _on_tool_launch(self, event):
         """双击/回车启动"""
