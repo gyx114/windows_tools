@@ -6,24 +6,24 @@
 
 ## 功能
 
-- 🚀 列出并启动 **管理控制台** (.msc) — `services.msc`, `compmgmt.msc` 等
-- 🚀 列出并启动 **控制面板项** (.cpl) — `appwiz.cpl`, `ncpa.cpl` 等
-- 🚀 列出并启动 **系统命令** — `regedit`, `dxdiag`, `msconfig` 等
-- 📋 交互式菜单浏览和启动
-- 🔍 关键词搜索
-- 📂 按分类组织（系统管理、硬件设备、网络、磁盘、用户安全等）
-- ✏️ **内置管理功能** — 添加/删除/导入工具，无需额外工具
-- �️ **图形界面模式** — `--gui` 或交互菜单按 `g` 启动
-- �💾 配置文件自动保存，支持便携模式和系统安装模式
+- 列出并启动 **管理控制台** (.msc) — `services.msc`, `compmgmt.msc` 等
+- 列出并启动 **控制面板项** (.cpl) — `appwiz.cpl`, `ncpa.cpl` 等
+- 列出并启动 **系统命令** — `regedit`, `dxdiag`, `msconfig` 等
+- 交互式菜单浏览和启动
+- 关键词搜索
+- 按分类组织（系统管理、硬件设备、网络、磁盘、用户安全等）
+- **内置管理功能** — 添加/删除/导入工具，无需额外工具
+- **图形界面模式** — `--gui` 或交互菜单按 `g` 启动
+- 配置文件自动保存，支持便携模式和系统安装模式
 
 ## 快速使用（无需 Python）
 
 ```cmd
 wtools.exe                   # 交互式菜单
 wtools.exe list              # 列出所有工具
-wtools.exe run calc          # 启动计算器
+wtools.exe run calc          # 启动系统可执行文件
 wtools.exe --gui             # 启动图形界面
-wtools.exe run services.msc
+wtools.exe run services.msc  # 运行系统组件
 wtools.exe search 网络
 ```
 
