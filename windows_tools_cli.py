@@ -82,6 +82,7 @@ def interactive_mode():
 
     # 添加搜索选项
     print(f"  {Color.GREEN} 0.{Color.RESET} {Color.CYAN}搜索工具{Color.RESET}")
+    print(f"  {Color.GREEN} g.{Color.RESET} {Color.BLUE}图形界面模式{Color.RESET}")
     print(f"  {Color.GREEN} m.{Color.RESET} {Color.MAGENTA}管理工具（添加/删除）{Color.RESET}")
     print(f"  {Color.GREEN} q.{Color.RESET} 退出")
 
@@ -91,6 +92,9 @@ def interactive_mode():
         return False
     elif choice == "0":
         search_and_launch()
+        return True
+    elif choice == "g":
+        launch_gui()
         return True
     elif choice == "m":
         show_manage_tools()
@@ -145,6 +149,18 @@ def search_and_launch():
                 launch_tool(results[idx][0])
         except ValueError:
             pass
+
+
+def launch_gui():
+    """从 CLI 交互模式启动图形界面"""
+    print(f"\n{Color.CYAN}正在启动图形界面...{Color.RESET}")
+    try:
+        import wtools_gui
+        wtools_gui.main()
+    except ImportError as e:
+        print(f"{Color.RED}✘ 无法加载图形界面: {e}{Color.RESET}")
+        print(f"{Color.YELLOW}  请确保 wtools_gui.py 存在{Color.RESET}")
+    input(f"\n{Color.DIM}按 Enter 返回 CLI 菜单...{Color.RESET}")
 
 
 def show_manage_tools():
@@ -221,6 +237,7 @@ def show_help():
   python windows_tools_cli.py list          {Color.DIM}# 列出所有工具{Color.RESET}
   python windows_tools_cli.py run <命令>    {Color.DIM}# 直接启动指定工具{Color.RESET}
   python windows_tools_cli.py search <关键词> {Color.DIM}# 搜索工具{Color.RESET}
+  python windows_tools_cli.py --gui         {Color.DIM}# 启动图形界面{Color.RESET}
   python windows_tools_cli.py help          {Color.DIM}# 显示帮助{Color.RESET}
 
 {Color.BOLD}管理工具（添加/删除/导入）:{Color.RESET}
@@ -234,11 +251,22 @@ def show_help():
   python windows_tools_cli.py run services.msc
   python windows_tools_cli.py run appwiz.cpl
   python windows_tools_cli.py search 网络
+  python windows_tools_cli.py --gui
   python adder.py add wt.exe Terminal 终端 "Windows Terminal"
 """)
 
 
 def main():
+    # --gui 参数：启动图形界面
+    if len(sys.argv) > 1 and sys.argv[1].lower() in ("--gui", "-g"):
+        try:
+            from wtools_gui import main as gui_main
+            gui_main()
+        except ImportError as e:
+            print(f"{Color.RED}✘ 无法加载图形界面: {e}{Color.RESET}")
+            print(f"  {Color.DIM}请确保 wtools_gui.py 在同目录下{Color.RESET}")
+        return
+
     if len(sys.argv) == 1:
         # 交互式模式
         print_banner()
