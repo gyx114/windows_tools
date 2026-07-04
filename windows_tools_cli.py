@@ -52,14 +52,28 @@ def list_all_tools():
             print(f"  {Color.GREEN}{cmd:<22}{Color.RESET} {Color.CYAN}{name:<18}{Color.RESET} {Color.DIM}{desc}{Color.RESET}")
 
 
+def _is_shell_uri(command):
+    """判断是否为 Windows shell URI 或 URL（无需检查可执行性）"""
+    return command.startswith(("shell:", "http://", "https://", "search:"))
+
+
 def launch_tool(command):
     """启动指定的 Windows 工具"""
-    # 检查命令是否存在
     cmd_lower = command.lower()
 
     # shutdown 需要参数
     if cmd_lower in ("shutdown",):
         print(f"{Color.YELLOW}⚠ 请使用完整参数启动，例如: shutdown /s /t 0{Color.RESET}")
+        return
+
+    # shell URI / URL：直接启动，无需检查文件存在性
+    if _is_shell_uri(cmd_lower):
+        try:
+            subprocess.run(f"start \"\" {command}", shell=True,
+                           stderr=subprocess.DEVNULL)
+            print(f"{Color.GREEN}✔ 已启动: {command}{Color.RESET}")
+        except Exception:
+            print(f"{Color.RED}✘ 启动失败: {command}{Color.RESET}")
         return
 
     # .msc/.cpl 文件：检查 System32 目录

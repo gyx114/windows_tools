@@ -208,12 +208,26 @@ class WindowsToolsGUI:
             return None
         return values  # (cmd, name, desc)
 
+    @staticmethod
+    def _is_shell_uri(cmd):
+        return cmd.startswith(("shell:", "http://", "https://", "search:"))
+
     def _launch_selected(self, event=None):
         """启动选中的工具"""
         tool = self._get_selected_tool()
         if not tool:
             return
         cmd = tool[0]
+
+        # shell URI / URL：直接启动，无需检查文件
+        if self._is_shell_uri(cmd):
+            try:
+                subprocess.run(f"start \"\" {cmd}", shell=True,
+                               stderr=subprocess.DEVNULL)
+                self.status_var.set(f"✅ 已启动: {cmd}")
+            except Exception as e:
+                messagebox.showerror("启动失败", f"无法启动 {cmd}\n{e}")
+            return
 
         # 检查命令是否存在
         if cmd.endswith((".msc", ".cpl")):
